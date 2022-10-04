@@ -61,6 +61,6 @@ if __name__ == '__main__':
         x = random()
         y = random()
         # Write the xy coordinates to a file
-        f.write(f"{x},{y}\n")
+        f.write(f"{x} {y}\n")
 
     f.close()
