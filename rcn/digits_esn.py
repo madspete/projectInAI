@@ -3,9 +3,13 @@ from sklearn.model_selection import train_test_split
 from pyrcn.datasets import load_digits
 from pyrcn.echo_state_network import ESNClassifier
 import numpy as np
+import data_handler as dh
+
+data = dh.DataHandler("data/raw_data_log_1.txt") # Object with data from single reading
+
 
 X, y = load_digits(return_X_y=True, as_sequence=True)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=42) 
 # X_train is training data and y_train is labels for that training data 
 # X_test is testing data and y_test is labels for that test data
 

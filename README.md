@@ -12,3 +12,7 @@ Install matplotlib
 ```
 pip install -U matplotlib
 ```
+Install numpy
+```
+pip install numpy
+```
