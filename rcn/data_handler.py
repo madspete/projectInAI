@@ -4,10 +4,11 @@ import numpy as np
 
 
 class DataHandler:
-    def __init__(self, filepath):
+    # creating an instance of this class will remove the previous data
+    def __init__(self):
         f = open("data/data.txt","w")
         f.close()
-        self.readfile(filepath)
+        # self.readfile(filepath)
 
     def readfile(self, filepath):
         self.filepath = filepath
@@ -47,5 +48,11 @@ class DataHandler:
             self.rawdata = f.readlines()
     
 
-dh = DataHandler("data/raw_data_log_1.txt")
-dh.readfile("data/raw_data_log_1.txt")
+
+dh = DataHandler()
+i = 0
+files = 1 # Number of raw_data_log_x.txt files to read
+while i < files:
+    dh.readfile("data/raw_data_log_" + str(files) + ".txt")
+    i += 1
+
