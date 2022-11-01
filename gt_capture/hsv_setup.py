@@ -20,7 +20,7 @@ class ControlBarBase:
 
   def __init__(self, img_path: Path):
     self.img_bgr: np.ndarray = cv2.imread(str(img_path))
-    self.img_bgr = self.img_bgr[36:1937, 577:2120] # change when the setup is changed
+    #self.img_bgr = self.img_bgr[36:1937, 577:2120] # change when the setup is changed
     self.init_window()
     self.init_track_bar()
 
@@ -67,13 +67,13 @@ class ControlBarHSV(ControlBarBase):
   #SCREEN_SIZE = ctypes.windll.user32.GetSystemMetrics(0) / 2, ctypes.windll.user32.GetSystemMetrics(1) / 2
 
   def init_track_bar(self):
-    self.build_track_bar('HMin', range_lim=(0, 179), default_value=0)
-    self.build_track_bar('SMin', (0, 255), 0)
-    self.build_track_bar('VMin', (0, 255), 0)
+    self.build_track_bar('HMin', range_lim=(0, 179), default_value=150)
+    self.build_track_bar('SMin', (0, 255), 55)
+    self.build_track_bar('VMin', (0, 255), 50)
 
     self.build_track_bar('HMax', (0, 179), 179)
-    self.build_track_bar('SMax', (0, 255), 255)
-    self.build_track_bar('VMax', (0, 255), 255)
+    self.build_track_bar('SMax', (0, 255), 120)
+    self.build_track_bar('VMax', (0, 255), 158)
 
   def render(self):
     # get current positions of all trackbars
