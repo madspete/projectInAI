@@ -17,15 +17,9 @@ def get_image(shh, remote_path="/home/pi/image.jpg", local_path="image.jpg"):
     ftp_client.close()
 
 def get_xy(image):
-    # TODO find the homography based on local measurements, meaning find the world coodinates and the pixels coordinates, 
-    # then the homography can map the circle coordinate sto the real world coordinates
-    #image = cv2.medianBlur(image,5)
-    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    cv2.imwrite('gray_image.png', gray_image)
-
-    # Set minimum and max HSV values to display
-    lower = np.array([150, 55, 50])
-    upper = np.array([179, 120, 158])
+    # Set minimum and max HSV values to display (measured manually)
+    lower = np.array([0, 40, 0])
+    upper = np.array([179, 255, 78])
 
     # Create HSV Image and threshold into a range.
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -35,8 +29,9 @@ def get_xy(image):
     # Convert to gray image and blur the image
     gray_image = cv2.cvtColor(img_output, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray_image, (5, 5), 0)
-    (thresh, im_bw) = cv2.threshold(blurred, 70, 255,  cv2.THRESH_BINARY)
 
+    (thresh, im_bw) = cv2.threshold(blurred, 30, 255,  cv2.THRESH_BINARY)
+    cv2.imwrite('gray_image.png', gray_image)
     cv2.imwrite('bw_image.png', im_bw)
     cnts = cv2.findContours(im_bw.copy(), cv2.RETR_EXTERNAL,
 	                        cv2.CHAIN_APPROX_SIMPLE)
@@ -47,7 +42,6 @@ def get_xy(image):
         return
     
     if len(cnts) > 1:
-        print("dialation operation")
         kernel = np.ones((7,7),np.uint8)
         im_bw = cv2.erode(im_bw,kernel,iterations = 1)
         im_bw = cv2.dilate(im_bw,kernel,iterations = 1)
@@ -70,14 +64,9 @@ def get_xy(image):
     cX = int(M["m10"] / M["m00"])
     cY = int(M["m01"] / M["m00"])
     center = np.float32(np.array([[[cX, cY]]])) 
-    print(center)
     H = find_homography()
-    print(H)
     dst = cv2.perspectiveTransform(center, H)
 
-    print(dst)
-    f = open("data/gt/test.txt", "a")
-    # TODO compute real world x and y and return
     x = dst[0][0][0]
     y = dst[0][0][1]
     
@@ -100,7 +89,7 @@ if __name__ == '__main__':
             break
         taking_image = True
         while True:
-            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("raspistill -o image.jpg")
+            ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command("raspistill -awb greyworld -o image.jpg")
             get_image(ssh, local_path=local_path)
             command = input("Happy with the image type y: ")
             if command == "y":
