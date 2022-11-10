@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import readline
 import numpy as np
+from numpy import genfromtxt
 
 
 class DataHandler:
@@ -13,25 +14,40 @@ class DataHandler:
     def readfile(self, filepath):
         self.filepath = filepath
         self.init_lines = []   
-        self.readxlines(17) 
+        self.readxlines(15) 
+        length = len(self.rawdata)
+        self.rawdataret = []
+
+        # my_data = 
             
         # trim data from string, so it can be converted to float
-        for i in range(len(self.rawdata)):
-            self.rawdata[i] = self.rawdata[i].replace(" ", "")
-            self.rawdata[i] = self.rawdata[i].replace(",",".")
-            self.rawdata[i] = self.rawdata[i].split('\t')
+        # for i in range(len(self.rawdata)):'
+        for i in range(length):
+            if self.rawdata[i].find("run") != -1:
+                continue
+            temp = self.rawdata[i].replace(" ", "")
+            temp = temp.replace(",",".")
+            temp = temp.replace('\n',"")
+            temp = temp.split("\t")
+            self.rawdataret.append(temp)
 
-        # convert data to float and np array
-        self.npdata = np.array(self.rawdata)
-        self.npdata = self.npdata.astype(np.float64)
-        # The data is now stored in columns as floats
-        
+        self.npdata = []
+        for i in range(len(self.rawdataret)):
+            temp = np.array(self.rawdataret[i])
+            self.npdata.append(temp.astype(float))
+            
+        # print(len(self.rawdataret))
+        # print(self.rawdataret[0])
+        # print(self.npdata[0])
+
+
         # Get average of each pos for given frequencies
-        unique_pos = np.unique(self.npdata[:,1])
+        self.npdata = np.asarray(self.npdata)
+        unique_pos = np.unique(self.npdata[:,0])
         data = self.npdata[:,2] # change column here to frequency/frequencies wanted
         f = open("data/data.txt","a")
         for i in unique_pos:
-            arr=np.array([(True if x==i else False) for x in zip(self.npdata[:,1])])
+            arr=np.array([(True if x==i else False) for x in zip(self.npdata[:,0])])
             if arr.any():
                 print(i,np.mean(data[arr]))
                 f.write(str(np.mean(data[arr])) + " ")
@@ -53,6 +69,6 @@ dh = DataHandler()
 i = 0
 files = 1 # Number of raw_data_log_x.txt files to read
 while i < files:
-    dh.readfile("data/raw_data_log_" + str(files) + ".txt")
+    dh.readfile("data/rawdata/Datalog_file_" + str(files) + ".txt")
     i += 1
 
