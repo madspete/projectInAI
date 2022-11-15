@@ -18,8 +18,8 @@ def get_image(shh, remote_path="/home/pi/image.jpg", local_path="image.jpg"):
 
 def get_xy(image):
     # Set minimum and max HSV values to display (measured manually)
-    lower = np.array([0, 40, 0])
-    upper = np.array([179, 255, 78])
+    lower = np.array([0, 0, 0])
+    upper = np.array([179, 255, 40])
 
     # Create HSV Image and threshold into a range.
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -30,7 +30,7 @@ def get_xy(image):
     gray_image = cv2.cvtColor(img_output, cv2.COLOR_BGR2GRAY)
     blurred = cv2.GaussianBlur(gray_image, (5, 5), 0)
 
-    (thresh, im_bw) = cv2.threshold(blurred, 30, 255,  cv2.THRESH_BINARY)
+    (thresh, im_bw) = cv2.threshold(blurred, 10, 255,  cv2.THRESH_BINARY)
     cv2.imwrite('gray_image.png', gray_image)
     cv2.imwrite('bw_image.png', im_bw)
     cnts = cv2.findContours(im_bw.copy(), cv2.RETR_EXTERNAL,
