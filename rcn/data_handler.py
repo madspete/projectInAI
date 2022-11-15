@@ -44,7 +44,7 @@ class DataHandler:
         # Get average of each pos for given frequencies
         self.npdata = np.asarray(self.npdata)
         unique_pos = np.unique(self.npdata[:,0])
-        data = self.npdata[:,2] # change column here to frequency/frequencies wanted
+        data = self.npdata[:,16] # change column here to frequency/frequencies wanted
         f = open("data/data.txt","a")
         for i in unique_pos:
             arr=np.array([(True if x==i else False) for x in zip(self.npdata[:,0])])
@@ -66,9 +66,11 @@ class DataHandler:
 
 
 dh = DataHandler()
-i = 0
-files = 1 # Number of raw_data_log_x.txt files to read
-while i < files:
-    dh.readfile("data/rawdata/Datalog_file_" + str(files) + ".txt")
+i = 1
+files = 300 # Number of raw_data_log_x.txt files to read
+while i <= files:
+    print(i)
+    dh.readfile("data/rawdata/Datalog_file_" + str(i) + ".txt")
+    print("")
     i += 1
 
