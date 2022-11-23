@@ -8,6 +8,7 @@ from pyrcn.datasets import mackey_glass
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import matplotlib.cm as cm
 import numpy as np
 import csv
 import sys
@@ -96,9 +97,13 @@ y_pred = elm.predict(X_test)
 x_mse = 0
 y_mse = 0
 mse = 0
+y_dist_list = []
+x_dist_list = []
 for i in range(len(y_pred)):
   x_dist = math.sqrt(pow(y_test[i][0] - y_pred[i][0],2))
   y_dist = math.sqrt(pow(y_test[i][1] - y_pred[i][1],2))
+  y_dist_list.append(y_dist)
+  x_dist_list.append(x_dist)
   dist = math.sqrt(pow((y_test[i][0] - y_pred[i][0]),2) + pow((y_test[i][1] - y_pred[i][1]),2))
   x_mse += pow(x_dist,2)
   y_mse += pow(y_dist,2)
@@ -113,8 +118,35 @@ print("x mse: ", x_mse)
 print("y mse: ", y_mse)
 print("mse: ", mse)
 
-# amount = list(range(0,len(y_pred)))
-# fig, ax = plt.subplots()
-# ax.plot(amount, y_pred, color="blue", marker=" ")
-# ax.plot(amount, y_test, color="green", marker=" ")
+amount = list(range(0,len(y_pred)))
+# print(amount)
+# print(y_pred)
+# print(len(y_test))
+fig, ax = plt.subplots()
+
+
+# colors = cm.gist_ncar(np.linspace(0, 1, len(amount)))
+# for y, c in zip(amount, colors):
+#     ax.scatter(y_pred[y,0], y_pred[y,1], color=c)
+#     ax.scatter(y_test[y,0], y_test[y,1], color=c, marker="x")
+# plt.title("ELM Test Data")
+# plt.xlabel("X coordinate [cm]")
+# plt.ylabel("Y coordinate [cm]")
+# plt.legend(['Prediction', 'Test data'])
 # plt.show()
+
+ax.scatter(y_test[:,0],x_dist_list)
+ax.scatter(y_test[:,1],y_dist_list)
+# i = 0
+# for x, y in zip(y_test[:,0], x_dist_list):
+#     i = i+1
+#     ax.text(x, y, str(i), color="red", fontsize=12)
+# i = 0
+# for x, y in zip(y_test[:,1], y_dist_list):
+#     i = i+1
+#     ax.text(x, y, str(i), color="red", fontsize=12)
+plt.title("ELM Error vs Coordinate")
+plt.xlabel("Coordinate [cm]")
+plt.ylabel("Error [cm]")
+plt.legend(['X coordinate', 'Y coordinate'])
+plt.show()
