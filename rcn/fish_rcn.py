@@ -5,6 +5,9 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import Ridge as skRidge
 from sklearn.datasets import make_blobs
 from pyrcn.datasets import mackey_glass
+from pyrcn.base.blocks import InputToNode
+from pyrcn.linear_model import IncrementalRegression
+from sklearn.model_selection import GridSearchCV
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -81,16 +84,53 @@ y_train = np.array(y_train)
 y_test = np.array(y_test)
 # print(y_test.shape)
 # print(len(X_train))
+tanh = 'tanh'
+
+param_grid = {
+  'input_to_node': [
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=100, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=200, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=300, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=400, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=500, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=600, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=700, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=800, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=900, random_state=42, input_activation='relu'),
+      InputToNode(
+          bias_scaling=1., hidden_layer_size=1000, random_state=42, input_activation='relu'),],
+  'regressor': [skRidge()],
+  'random_state': [42]}
 
 
+
+
+elm = GridSearchCV(ELMRegressor(), param_grid)
+
+elm.fit(X=X_train, y=y_train)
+y_elm = elm.predict(X_test)
+print("tests - elm:\n x | y \n {0}".format(y_test-y_elm))
+print("best_params_: {0}".format(elm.best_params_))
+print("best_score: {0}".format(elm.best_score_))
+print("best_index: {0}".format(elm.best_index_))
+# print(elm[8])
+y_pred = y_elm
 # Initialize and train an ELMRegressor and an ESNRegressor
-esn = ESNRegressor().fit(X=X_train, y=y_train)
-elm = ELMRegressor(regressor=skRidge()).fit(X=X_train, y=y_train)
+# esn = ESNRegressor().fit(X=X_train, y=y_train)
+# elm = ELMRegressor(regressor=skRidge()).fit(X=X_train, y=y_train)
 print("Fitted models")
-
 y_pred = elm.predict(X_test)
-
-# print(y_pred.shape)
+# print("params: {0}".format(elm.get_params()))
+# # print(y_pred.shape)
 # print(X_train.shape)
 # print(y_train.shape)
 
@@ -149,4 +189,4 @@ plt.title("ELM Error vs Coordinate")
 plt.xlabel("Coordinate [cm]")
 plt.ylabel("Error [cm]")
 plt.legend(['X coordinate', 'Y coordinate'])
-plt.show()
+# plt.show()

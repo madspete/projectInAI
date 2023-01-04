@@ -7,7 +7,7 @@ from numpy import genfromtxt
 class DataHandler:
     # creating an instance of this class will remove the previous data
     def __init__(self):
-        f = open("data/data.txt","w")
+        f = open("data/test_data.txt","w")
         f.close()
         # self.readfile(filepath)
 
@@ -67,10 +67,10 @@ class DataHandler:
 
 dh = DataHandler()
 i = 1
-files = 300 # Number of raw_data_log_x.txt files to read
+files = 35 # Number of raw_data_log_x.txt files to read
 while i <= files:
     print(i)
-    dh.readfile("data/rawdata/Datalog_file_" + str(i) + ".txt")
+    dh.readfile("data/testdata/PiAI_test_data/Test_file_" + str(i) + ".txt")
     print("")
     i += 1
 
