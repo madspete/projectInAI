@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import csv
+import numpy as np
 
 files = ["ValMSE.txt", "TrainMSE.txt"]
 data = []
@@ -24,7 +25,7 @@ for file in files:
 # Plot validation MSE
 plt.figure()
 for i in range(nExperiments):
-    plt.plot(epochs, data[0][i], label=str(nHiddenLayers+i) + " hidden layers")
+    plt.plot(epochs, data[0][i], label=str(nHiddenLayers+i) + " hidden layers: " + str(round(np.min(data[0][i]),2)))
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error [cm]')
 plt.title('Validation MSE')
@@ -33,7 +34,7 @@ plt.legend()
 # Plot training MSE
 plt.figure()
 for i in range(nExperiments):
-    plt.plot(epochs, data[1][i], label=str(nHiddenLayers+i)+" hidden layers")
+    plt.plot(epochs, data[1][i], label=str(nHiddenLayers+i)+" hidden layers: " + str(round(np.min(data[1][i]),2)))
 plt.xlabel('Epochs')
 plt.ylabel('Mean Squared Error [cm]')
 plt.title('Training MSE')

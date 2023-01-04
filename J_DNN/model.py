@@ -4,10 +4,10 @@ import statistics
 import numpy as np
 
 # Function written by Mads Holm Peters
-def load_data(data_file, targets_file):
+def load_data(data_file, targets_file, delim):
     data = []
     with open(data_file) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader = csv.reader(csv_file, delimiter=delim)
         for row in csv_reader:
             temp_data = []
             for i in range(16):
@@ -37,7 +37,7 @@ def load_data(data_file, targets_file):
     
     targets = []
     with open(targets_file) as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
+        csv_reader = csv.reader(csv_file, delimiter=delim)
         for row in csv_reader:
             temp_data = []
             temp_data.append(float(row[0]))
@@ -133,21 +133,29 @@ def writeMetricsToFile(filename, data):
 
 if __name__ == '__main__':
 
+	performTrain = False
+
 	# Training and validation filepaths
 	trainDataFilePath = '../data/train/features.txt'
 	trainTargetFilePath = '../data/train/targets.txt'
 	valDataFilePath = '../data/val/features.txt'
 	valTargetFilePath = '../data/val/targets.txt'
+	testDataFilePath = '../data/test_data.txt'
+	testTargetFilePath = '../data/test/test.txt'
 
 	# Loading the data.
 	# Training dataset consists of 240 samples.
 	# Validation dataset consists of 60 samples.
-	trainingData, trainingLabels = load_data(trainDataFilePath, trainTargetFilePath)
-	validationData, validationLabels = load_data(valDataFilePath, valTargetFilePath)
+	# Test dataset consists of XX samples.
+	trainingData, trainingLabels = load_data(trainDataFilePath, trainTargetFilePath, ',')
+	validationData, validationLabels = load_data(valDataFilePath, valTargetFilePath, ',')
+	testData, testLabels = load_data(testDataFilePath,testTargetFilePath, ' ')
 	print("Training data shape: ", trainingData.shape) # 240 training samples
 	print("Training labels shape: ", trainingLabels.shape)
 	print("Validation data shape: ", validationData.shape) # 60 validation samples
 	print("Validation labels shape: ", validationLabels.shape)
+	print("Test data shape: ", testData.shape) # XX test samples
+	print("Test labels shape: ", testLabels.shape)
 
 	# Creating the datasets.
 	trainingBatchSize = 16
@@ -159,44 +167,63 @@ if __name__ == '__main__':
 	# This is why the validation dataset is also split into batches.
 	trainingDataset = tf.data.Dataset.from_tensor_slices((trainingData, trainingLabels)).batch(trainingBatchSize)
 	validationDataset = tf.data.Dataset.from_tensor_slices((validationData, validationLabels)).batch(validationBatchSize)
+	testDataset = tf.data.Dataset.from_tensor_slices((testData, testLabels)).batch(1)
 
-	for i in range(4):
+	if performTrain:
+		
 
-		avgValMSE = []
-		avgTrainMSE = []
+		for i in range(4):
 
-		for j in range(5):
+			avgValMSE = []
+			avgTrainMSE = []
 
-			# MODEL PARAMETERS
-			# Define the input size of the model. Each datapoint contains 16 values.
-			inputSize = 16
-			# Define the number of hidden layers in the model, this includes the output-layer, even though it is not hidden.
-			nHiddenLayers = 4 + i
-			# Number of neurons in the first hidden layer
-			nFirstLayerNeurons = 30
+			for j in range(5):
 
-			# TRAINING PARAMETERS
-			# Number of epochs to train
-			epochs = 1500
-			# Starting learning rate
-			learningRate = 1e-2
+				# MODEL PARAMETERS
+				# Define the input size of the model. Each datapoint contains 16 values.
+				inputSize = 16
+				# Define the number of hidden layers in the model, this includes the output-layer, even though it is not hidden.
+				nHiddenLayers = 4 + i
+				# Number of neurons in the first hidden layer
+				nFirstLayerNeurons = 30
 
-			# Create and train model
-			modelName = str(nHiddenLayers) + "HiddenLayers"
-			mlp = MLP()
-			mlp.buildModel(inputSize,nHiddenLayers,nFirstLayerNeurons)
-			stats = mlp.train(trainingDataset, validationDataset, epochs, learningRate, modelName)
+				# TRAINING PARAMETERS
+				# Number of epochs to train
+				epochs = 1500
+				# Starting learning rate
+				learningRate = 1e-2
 
-			# Get metrics from training
-			valMSE = stats.history["val_mean_squared_error"]
-			trainMSE = stats.history["mean_squared_error"]
+				# Create and train model
+				modelName = str(nHiddenLayers) + "HiddenLayers"
+				mlp = MLP()
+				mlp.buildModel(inputSize,nHiddenLayers,nFirstLayerNeurons)
+				stats = mlp.train(trainingDataset, validationDataset, epochs, learningRate, modelName)
 
-			avgValMSE.append(valMSE)
-			avgTrainMSE.append(trainMSE)
+				# Get metrics from training
+				valMSE = stats.history["val_mean_squared_error"]
+				trainMSE = stats.history["mean_squared_error"]
 
-		print(avgValMSE)
-		avgValMSE = np.average(avgValMSE,axis= 0)
-		print(avgValMSE)
-		avgTrainMSE = np.average(avgTrainMSE,axis= 0)
-		writeMetricsToFile("ValMSE", avgValMSE)
-		writeMetricsToFile("TrainMSE", avgTrainMSE)
+				avgValMSE.append(valMSE)
+				avgTrainMSE.append(trainMSE)
+
+			print(avgValMSE)
+			avgValMSE = np.average(avgValMSE,axis= 0)
+			print(avgValMSE)
+			avgTrainMSE = np.average(avgTrainMSE,axis= 0)
+			writeMetricsToFile("ValMSE", avgValMSE)
+			writeMetricsToFile("TrainMSE", avgTrainMSE)
+	else:
+
+		# Load model
+		model = tf.keras.models.load_model('4HiddenLayers.hdf5')
+		# Make predictions
+		predictions = model.predict(testDataset)
+		# Calculated differences
+		diff = predictions - testLabels
+		squaredDiff = np.square(diff)
+		meanX = np.sum(squaredDiff[0]) / len(squaredDiff[0])
+		meanY = np.sum(squaredDiff[1]) / len(squaredDiff[1])
+		print(meanX)
+		print(meanY)
+		
+	
