@@ -218,9 +218,13 @@ if __name__ == '__main__':
 		model = tf.keras.models.load_model('4HiddenLayers.hdf5')
 		# Make predictions
 		predictions = model.predict(testDataset)
+		print(predictions)
+		print(testLabels)
 		# Calculated differences
 		diff = predictions - testLabels
+		print(diff)
 		squaredDiff = np.square(diff)
+		print(squaredDiff)
 		meanX = np.sum(squaredDiff[0]) / len(squaredDiff[0])
 		meanY = np.sum(squaredDiff[1]) / len(squaredDiff[1])
 		print(meanX)
