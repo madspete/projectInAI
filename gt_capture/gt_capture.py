@@ -72,7 +72,7 @@ def get_xy(image):
     
     command = input(f"Cordinates x: {x} y: {y} write to a file type w: ")
     if command == 'w':
-        f = open("data/gt/test.txt", "a")
+        f = open("data/test/test.txt", "a")
         # Write the xy coordinates to a file
         f.write(f"{x} {y}\n")
         f.close()
